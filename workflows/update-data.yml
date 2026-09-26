@@ -1,0 +1,33 @@
+name: Refresh Water Data (Every 3 Hours)
+
+on:
+  schedule:
+    - cron: '0 */3 * * *' # รันทุก 3 ชั่วโมง
+  workflow_dispatch:
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Fetch Latest Thaiwater & ONWR Data
+        env:
+          THAIWATER_API_KEY: ${{ secrets.THAIWATER_API_KEY }}
+        run: |
+          mkdir -p data
+          # ดึงข้อมูลระดับน้ำ และอ่างเก็บน้ำลำตะคอง
+          curl -s "https://api-v3.thaiwater.net/api/v1/thaiwater30/public/waterlevel_load" > data/waterlevel.json || true
+          curl -s "https://api-v3.thaiwater.net/api/v1/thaiwater30/public/dam_load" > data/dam.json || true
+          
+          # บันทึก timestamp การอัปเดตล่าสุด
+          echo "{\"last_updated\": \"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"}" > data/status.json
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "actions@github.com"
+          git add data/
+          git diff-index --quiet HEAD || git commit -m "Auto-update flood data [skip ci]"
+          git push

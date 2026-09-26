@@ -1,0 +1,45 @@
+{
+  "last_updated": "2026-09-26T18:00:00Z",
+  "rainfall_nongphailom_24h": 42.5,
+  "lamtakhong_dam": {
+    "capacity_mcm": 314.49,
+    "current_volume_mcm": 220.15,
+    "current_percent": 70.0,
+    "inflow_mcm": 1.85,
+    "outflow_mcm": 0.45
+  },
+  "stations": [
+    {
+      "id": "M177",
+      "name": "บ้านลาดบัวขาว ต.ลาดบัวขาว อ.สีคิ้ว จ.นครราชสีมา",
+      "water_level": 5.20,
+      "bank_level": 7.50,
+      "flow_rate": 18.5,
+      "status": "normal"
+    },
+    {
+      "id": "M192",
+      "name": "บ้านโนนค่า ต.บุ่งขี้เหล็ก อ.สูงเนิน จ.นครราชสีมา",
+      "water_level": 4.80,
+      "bank_level": 6.00,
+      "flow_rate": 22.1,
+      "status": "warning"
+    },
+    {
+      "id": "M191",
+      "name": "บ้านโคกกรวด ต.โคกกรวด อ.เมืองนครราชสีมา จ.นครราชสีมา",
+      "water_level": 4.10,
+      "bank_level": 5.50,
+      "flow_rate": 25.4,
+      "status": "warning"
+    },
+    {
+      "id": "M164",
+      "name": "ตำบลในเมือง อ.เมืองนครราชสีมา จ.นครราชสีมา",
+      "water_level": 3.20,
+      "bank_level": 4.00,
+      "flow_rate": 28.0,
+      "status": "danger"
+    }
+  ]
+}
