@@ -211,7 +211,7 @@
                             <th class="p-3">สถานีตรวจวัด</th>
                             <th class="p-3">ระดับน้ำ (ม.รทก.)</th>
                             <th class="p-3">ระดับตลิ่ง (ม.รทก.)</th>
-                            <th class="p-3">ปริมาณน้ำ (ลบ.ม./วิ)</th>
+                            <th class="p-3">ปริมาณน้ำ (ม.3/วิ.)</th>
                             <th class="p-3">อัตราการไหล (cms)</th>
                         </tr>
                     </thead>
@@ -273,12 +273,12 @@
 
     <!-- JavaScript สำหรับควบคุมระบบ Realtime, API Simulation และกราฟ -->
     <script>
-        // ข้อมูลสถานีลำตะคอง 4 สถานีหลัก
+        // ข้อมูลสถานีลำตะคอง 4 สถานีหลัก พร้อมค่าอ้างอิงระดับน้ำและตลิ่ง (ม.รทก.) ที่ถูกต้อง
         const stationsData = [
-            { id: "M177", name: "M177 บ้านลาดบัวขาว", loc: "ต.ลาดบัวขาว อ.สีคิ้ว", waterLevel: 278.40, bankLevel: 280.00, flowRate: 42.5, discharge: 38.2 },
-            { id: "M192", name: "M192 บ้านโนนค่า", loc: "ต.บุ่งขี้เหล็ก อ.สูงเนิน", waterLevel: 215.10, bankLevel: 217.00, flowRate: 55.8, discharge: 50.1 },
-            { id: "M191", name: "M191 บ้านโคกกรวด", loc: "ต.โคกกรวด อ.เมือง", waterLevel: 184.20, bankLevel: 186.50, flowRate: 68.3, discharge: 62.0 },
-            { id: "M164", name: "M164 ตำบลในเมือง", loc: "อ.เมืองนครราชสีมา", waterLevel: 178.65, bankLevel: 180.00, flowRate: 75.4, discharge: 70.5 }
+            { id: "M177", name: "M177 บ้านลาดบัวขาว", loc: "ต.ลาดบัวขาว อ.สีคิ้ว", waterLevel: 240.20, bankLevel: 242.42, flowRate: 38.5, discharge: 38.2 },
+            { id: "M192", name: "M192 บ้านโนนค่า", loc: "ต.บุ่งขี้เหล็ก อ.สูงเนิน", waterLevel: 215.10, bankLevel: 217.00, flowRate: 52.0, discharge: 50.1 },
+            { id: "M191", name: "M191 บ้านโคกกรวด", loc: "ต.โคกกรวด อ.เมือง", waterLevel: 193.10, bankLevel: 194.80, flowRate: 65.4, discharge: 62.0 },
+            { id: "M164", name: "M164 ตำบลในเมือง", loc: "อ.เมืองนครราชสีมา", waterLevel: 176.65, bankLevel: 177.60, flowRate: 72.8, discharge: 70.5 }
         ];
 
         // รายชื่อชุมชนเสี่ยงในเขตเทศบาลนครนครราชสีมา
@@ -301,7 +301,6 @@
             if (isManual) refreshIcon.classList.add('fa-spin');
 
             try {
-                // จำลองการเรียก API ตามข้อกำหนดมาตรฐาน Thaiwater.net
                 // 1. ข้อมูลฝนสะสม 20 ชม. (สถานี ต.หนองไผ่ล้อม)
                 const rainVal = (15.5 + Math.random() * 5).toFixed(1);
                 document.getElementById('rain-value').innerHTML = `${rainVal} <span class="text-sm font-normal">มม.</span>`;
@@ -334,10 +333,11 @@
                 document.getElementById('dam-outflow').innerText = (2.1 + Math.random() * 0.5).toFixed(2);
                 document.getElementById('dam-progress-bar').style.width = `${damPct}%`;
 
-                // 4. ข้อมูลสถานีลุ่มน้ำลำตะคอง (ปรับค่าสุ่มสมจริง)
+                // 4. ข้อมูลสถานีลุ่มน้ำลำตะคอง (ปรับค่าสุ่มสมจริงบนฐานข้อมูล ม.รทก.)
                 stationsData.forEach(station => {
-                    station.waterLevel = +(station.waterLevel + (Math.random() * 0.2 - 0.1)).toFixed(2);
-                    station.flowRate = +(station.flowRate + (Math.random() * 2 - 1)).toFixed(1);
+                    station.waterLevel = +(station.waterLevel + (Math.random() * 0.1 - 0.05)).toFixed(2);
+                    station.flowRate = +(station.flowRate + (Math.random() * 1 - 0.5)).toFixed(1);
+                    station.discharge = +(station.discharge + (Math.random() * 1 - 0.5)).toFixed(1);
                 });
 
                 updateStationsTable();
@@ -368,8 +368,8 @@
             stationsData.forEach(st => {
                 const diff = (st.bankLevel - st.waterLevel).toFixed(2);
                 let badgeColor = "text-emerald-400 bg-emerald-950/40 border-emerald-800";
-                if (diff < 1.0) badgeColor = "text-red-400 bg-red-950/40 border-red-800";
-                else if (diff < 2.0) badgeColor = "text-amber-400 bg-amber-950/40 border-amber-800";
+                if (diff < 0.8) badgeColor = "text-red-400 bg-red-950/40 border-red-800";
+                else if (diff < 1.5) badgeColor = "text-amber-400 bg-amber-950/40 border-amber-800";
 
                 const row = document.createElement('tr');
                 row.className = "hover:bg-blue-900/30 transition";
@@ -379,10 +379,10 @@
                         <div class="text-[11px] text-slate-400">${st.loc}</div>
                     </td>
                     <td class="p-3">
-                        <span class="px-2.5 py-1 rounded-lg border ${badgeColor} font-semibold">${st.waterLevel} ม.</span>
+                        <span class="px-2.5 py-1 rounded-lg border ${badgeColor} font-semibold">${st.waterLevel} ม.รทก.</span>
                     </td>
-                    <td class="p-3 text-slate-300">${st.bankLevel} ม.</td>
-                    <td class="p-3 text-cyan-300 font-medium">${st.flowRate} ลบ.ม./วิ</td>
+                    <td class="p-3 text-slate-300">${st.bankLevel} ม.รทก.</td>
+                    <td class="p-3 text-cyan-300 font-medium">${st.flowRate} ม.3/วิ.</td>
                     <td class="p-3 text-slate-300">${st.discharge} cms</td>
                 `;
                 tbody.appendChild(row);
@@ -464,19 +464,17 @@
             const diff = m164Bank - m164Water;
 
             communities.forEach((comm, index) => {
-                // กำหนดเกณฑ์สีตามความเสี่ยงลุ่มน้ำ
                 let riskColor = "border-emerald-500/40 bg-emerald-950/20";
                 let badgeBg = "bg-emerald-500 text-slate-950";
                 let statusText = "ปกติ (เฝ้าระวังทั่วไป)";
                 let iconClass = "fa-circle-check text-emerald-400";
 
-                // เงื่อนไขจำลองความเสี่ยงแตกต่างกันเล็กน้อยในแต่ละชุมชน
-                if (diff < 1.2 || (index % 3 === 0 && rain > 18)) {
+                if (diff < 0.8 || (index % 3 === 0 && rain > 18)) {
                     riskColor = "border-red-500/60 bg-red-950/30 shadow-lg shadow-red-950/50";
                     badgeBg = "bg-red-500 text-white animate-pulse";
                     statusText = "วิกฤต/เตือนภัย (เตรียมอพยพสิ่งของ)";
                     iconClass = "fa-triangle-exclamation text-red-400";
-                } else if (diff < 2.0 || rain > 15) {
+                } else if (diff < 1.3 || rain > 15) {
                     riskColor = "border-amber-500/50 bg-amber-950/25";
                     badgeBg = "bg-amber-400 text-slate-950";
                     statusText = "เฝ้าระวังสูงสุด (ติดตามข่าวสารใกล้ชิด)";
@@ -519,7 +517,7 @@
                     `รีเฟรชถอยหลังใน: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
                 if (countdownTime <= 0) {
-                    fetchAllData(false); // เรียกอัปเดตข้อมูลอัตโนมัติเมื่อครบ 1 ชม.
+                    fetchAllData(false);
                 }
             }, 1000);
         }
